@@ -1,0 +1,30 @@
+<sdf version="1.6">
+  <model name="animated_box">
+    <static>false</static>
+    <pose>-1 -1 1.0 0 0 0</pose>
+    <link name="link">
+      <inertial>
+        <mass>1.0</mass>
+        <inertia>
+          <ixx>0.01</ixx><ixy>0</ixy><ixz>0</ixz>
+          <iyy>0.01</iyy><iyz>0</iyz><izz>0.01</izz>
+        </inertia>
+      </inertial>
+      <collision name="col">
+        <geometry><box><size>0.5 0.5 0.5</size></box></geometry>
+      </collision>
+      <visual name="vis">
+        <geometry><box><size>0.5 0.5 0.5</size></box></geometry>
+      </visual>
+    </link>
+
+    <!-- Optional: motion via cmd_vel -->
+    <!-- Replace filename if you prefer another plugin -->
+    <plugin name="animated_box_move" filename="libgazebo_ros_planar_move.so">
+      <robotNamespace>/animated_box</robotNamespace>
+      <commandTopic>cmd_vel</commandTopic>
+      <odometryTopic>odom</odometryTopic>
+      <odometryFrame>odom</odometryFrame>
+    </plugin>
+  </model>
+</sdf>

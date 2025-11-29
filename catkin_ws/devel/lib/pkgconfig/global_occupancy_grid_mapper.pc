@@ -1,0 +1,8 @@
+prefix=/home/hanif/Hanif-Workspace/Homework_3/catkin_ws/devel
+
+Name: global_occupancy_grid_mapper
+Description: Description of global_occupancy_grid_mapper
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

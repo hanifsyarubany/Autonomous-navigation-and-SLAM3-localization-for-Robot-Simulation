@@ -1,0 +1,8 @@
+prefix=/home/hanif/Hanif-Workspace/Homework_3/catkin_ws/devel
+
+Name: main_simulator
+Description: Description of main_simulator
+Version: 0.0.1
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

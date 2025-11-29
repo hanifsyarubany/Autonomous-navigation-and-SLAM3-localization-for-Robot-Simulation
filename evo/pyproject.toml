@@ -1,0 +1,80 @@
+[project.urls]
+Homepage = "https://github.com/MichaelGrupp/evo"
+Wiki = "https://github.com/MichaelGrupp/evo/wiki"
+Bugtracker = "https://github.com/MichaelGrupp/evo/issues"
+
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+
+[tool.hatch.version]
+path = "evo/__init__.py"
+
+
+[project]
+name = "evo"
+description = "Python package for the evaluation of odometry and SLAM"
+authors = [
+    { name="Michael Grupp", email="michael.grupp@tum.de" },
+]
+license = { text = "GNU General Public License v3 (GPLv3)" }
+readme = "README.md"
+dynamic = ["version"]
+
+classifiers = [
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Topic :: Scientific/Engineering",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Programming Language :: Python :: Implementation :: CPython"
+]
+keywords = [
+    "SLAM", "odometry", "trajectory", "evaluation", "metric",
+    "vision", "laser", "visual", "robotics"
+]
+
+# Adapt also the extra check in __init__.py when changing this:
+requires-python = ">=3.10"
+
+dependencies = [
+    "numpy>=1.18.5",
+    "matplotlib>=3.6.0",
+    "scipy>=1.2",
+    "pandas",
+    "numexpr>=2.7.3",
+    "seaborn>=0.9",
+    "natsort",
+    "argcomplete",
+    "colorama>=0.3",
+    "pygments",
+    "pyyaml",
+    "pillow",
+    "rosbags>=0.11.0",
+    "packaging",
+]
+
+[project.optional-dependencies]
+gui = ["PyQt6"]
+geo = ["contextily"]
+rerun = ["rerun-sdk>=0.24.0"]
+
+
+[project.scripts]
+evo_ape = "evo.entry_points:ape"
+evo_rpe = "evo.entry_points:rpe"
+evo_traj = "evo.entry_points:traj"
+evo_res = "evo.entry_points:res"
+evo_config = "evo.main_config:main"
+evo_ipython = "evo.main_ipython:main"
+evo = "evo.main_evo:main"
+
+
+[tool.black]
+line-length = 79

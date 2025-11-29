@@ -1,0 +1,81 @@
+<?xml version="1.0"?>
+<launch>
+  <param name="use_sim_time" value="true" />
+
+  <arg name="use_sim_time" default="true"/>
+  <arg name="gui" default="true"/>
+  <arg name="headless" default="false"/>
+  <arg name="world_name" default="$(find main_simulator)/worlds/obstacles_static_x10.world" />
+  <arg name="in_topic"  default="/odom"/>
+  <arg name="out_topic" default="/ground_truth/pose"/>
+
+  <!-- World/model search paths -->
+  <env name="GAZEBO_MODEL_PATH" value="$(find models)/world_and_object_references/gazebo_models_worlds_collection/models"/>
+
+  <!-- Start Gazebo with a specific world -->
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="debug" value="0"/>
+    <arg name="gui" value="$(arg gui)"/>
+    <arg name="use_sim_time" value="$(arg use_sim_time)"/>
+    <arg name="headless" value="$(arg headless)"/>
+    <arg name="world_name" value="$(arg world_name)"/> 
+    <arg name="paused" value="false"/>
+  </include>
+
+  <!-- Spawn the MAIN ROBOT -->
+  <include file="$(find nexus_4wd_mecanum_description)/launch/nexus_4wd_mecanum_description_depth-camera.launch" />
+  <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model"
+        args="-urdf -model nexus_4wd_mecanum -param robot_description -x 0.0 -y 0.0 -z 0.5" />
+
+  <!-- Generate local heightmap -->
+  <node pkg="local_costmap_generator" type="heightmap_node" name="heightmap_node" output="screen">
+    <param name="full_clouds" value="true" /> 
+  </node>
+
+  <!-- Generate local costmap -->
+  <node pkg="local_costmap_generator" type="heightmap_costmap_node" name="heightmap_costmap_node" output="screen">
+  </node>
+
+  <!-- Publish global map -->
+  <node name="map_server" pkg="map_server" type="map_server" args="$(find global_occupancy_grid_mapper)/result/my_map.yaml"/>
+
+  <!-- Map to Odom -->
+  <node pkg="tf2_ros" type="static_transform_publisher" name="map_to_odom"
+        args="0 0 0 0 0 0 map odom" />
+
+  <!-- motion primitives-->
+  <node name="control_space_planner_node" pkg="control_space_planner" type="control_space_planner_node" output="screen"/> 
+
+  <!-- RVIZ visualization -->
+  <node pkg="rviz" type="rviz" name="rviz" required="true"
+          args="-d $(find rviz_visualization)/config_p2.rviz"/>
+
+  <!-- Graph planner -->
+  <node pkg="graph_planner_1" name="graph_planner_node" type="graph_planner_1_node"  respawn="true" output="screen">
+      <param name="csv_path"                  value="$(find graph_planner_1)/csv/graph_planner_gazebo.csv" />
+      <param name="robot_postion_topic"       value="/odom" />
+      <param name="use_rviz_goal"             value="false" />
+  </node>
+
+  <!-- Nodelet -->
+  <node pkg="nodelet" type="nodelet" name="depth_to_rgb" args="standalone depth_image_proc/register">
+    <remap from="depth/image_rect"       to="/camera/depth/image_raw"/>
+    <remap from="depth/camera_info"      to="/camera/depth/camera_info"/>
+
+    <remap from="rgb/image_rect"         to="/camera/color/image_raw"/>
+    <remap from="rgb/camera_info"        to="/camera/color/camera_info"/>
+
+    <remap from="registered/image_rect"  to="/camera/depth_registered/image_raw"/>
+    <remap from="registered/camera_info" to="/camera/depth_registered/camera_info"/>
+  </node>
+
+  <!-- Odom to pose -->
+  <node pkg="main_simulator"
+        type="odom_to_pose.py"
+        name="odom_to_pose"
+        output="screen">
+    <param name="input_topic"  value="/odom"/>
+    <param name="output_topic" value="/ground_truth/pose"/>
+  </node>
+
+</launch>

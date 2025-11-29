@@ -1,0 +1,60 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!-- Macro with params so you can reuse/mount anywhere -->
+  <xacro:macro name="lidar_2d" params="parent:=base_link link:=laser_frame topic:=/scan">
+    <joint name="${link}_joint" type="fixed">
+      <parent link="${parent}"/>
+      <child link="${link}"/>
+      <origin xyz="0 0 0.047" rpy="0 0 0"/>
+    </joint>
+
+    <link name="${link}">
+      <visual>
+        <geometry><cylinder radius="0.05" length="0.04"/></geometry>
+        <material name="red"/>
+      </visual>
+      <collision>
+        <geometry><cylinder radius="0.05" length="0.04"/></geometry>
+      </collision>
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="0.055"/>
+        <inertia ixx="0.000021370" ixy="0" ixz="0"
+                 iyy="0.000009966" iyz="0"
+                 izz="0.000021370"/>
+      </inertial>
+    </link>
+
+    <gazebo reference="${link}">
+      <material>Gazebo/Red</material>
+      <sensor name="${link}_laser" type="ray">
+        <pose>0 0 0 0 0 0</pose>
+        <visualize>true</visualize>
+        <update_rate>10</update_rate>
+        <ray>
+          <scan>
+            <horizontal>
+              <samples>360</samples>
+              <resolution>1</resolution>
+              <min_angle>-3.14</min_angle>
+              <max_angle> 3.14</max_angle>
+            </horizontal>
+          </scan>
+          <range>
+            <min>0.3</min>
+            <max>12.0</max>
+            <resolution>0.01</resolution>
+          </range>
+        </ray>
+
+        <!-- ROS bridge: CPU version; use *_gpu_laser.so if sensor type="gpu_ray" -->
+        <plugin name="${link}_laser_ros" filename="libgazebo_ros_laser.so">
+          <topicName>${topic}</topicName>
+          <frameName>${link}</frameName>
+        </plugin>
+      </sensor>
+    </gazebo>
+  </xacro:macro>
+
+</robot>

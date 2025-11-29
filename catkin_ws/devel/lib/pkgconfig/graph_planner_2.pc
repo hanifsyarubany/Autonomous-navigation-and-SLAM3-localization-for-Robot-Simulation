@@ -1,0 +1,8 @@
+prefix=/home/hanif/Hanif-Workspace/Homework_3/catkin_ws/devel
+
+Name: graph_planner_2
+Description: Description of graph_planner_2
+Version: 0.0.0
+Cflags: -I/home/hanif/Hanif-Workspace/Homework_3/catkin_ws/src/graph_planner/graph_planner_2/include
+Libs: -L${prefix}/lib -lopencv
+Requires: 

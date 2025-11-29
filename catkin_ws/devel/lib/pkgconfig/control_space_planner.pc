@@ -1,0 +1,8 @@
+prefix=/home/hanif/Hanif-Workspace/Homework_3/catkin_ws/devel
+
+Name: control_space_planner
+Description: Description of control_space_planner
+Version: 0.0.0
+Cflags: -I/home/hanif/Hanif-Workspace/Homework_3/catkin_ws/src/control_space_planner/include
+Libs: -L${prefix}/lib -la_star_library
+Requires: roscpp rospy std_msgs tf

@@ -1,0 +1,9 @@
+<launch>
+  <arg name="out_bag" default="$(env HOME)/Hanif-Workspace/Homework_3/Dataset/robot_simulation_with_orb_slam3_nFeatures_1000.bag"/>
+
+  <node pkg="rosbag" type="record" name="rec" output="screen"
+        args="-O $(arg out_bag)
+              /tf /clock /ground_truth/pose
+              /orb_slam3/pose /orb_slam3/odom"/>
+
+</launch>

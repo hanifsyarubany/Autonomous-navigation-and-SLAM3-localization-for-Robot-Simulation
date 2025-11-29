@@ -1,0 +1,148 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!-- 3D LiDAR macro (Gazebo Classic + ROS Noetic) -->
+  <!-- Params:
+       parent, link, frame, topic,
+       publish_pointcloud (true -> PointCloud2 via block_laser; false -> LaserScan via gpu_laser),
+       horizontal_samples, vertical_samples, v_min, v_max, h_min, h_max,
+       update_rate, range_min, range_max, range_res
+  -->
+  <xacro:macro name="lidar_3d" params="
+      parent:=base_link
+      link:=lidar_link
+      frame:=__auto__
+      topic:=__auto__
+      publish_pointcloud:=true
+      horizontal_samples:=1024
+      vertical_samples:=16
+      v_min:=-0.2618
+      v_max:=0.2618
+      h_min:=-3.14
+      h_max:=3.14
+      update_rate:=10
+      range_min:=0.1
+      range_max:=50.0
+      range_res:=0.01">
+
+    <!-- Resolve frame/topic without C-style ternary -->
+    <!-- Default frame = link unless overridden -->
+    <xacro:property name="lidar_frame" value="${link}"/>
+    <xacro:if value="${frame != '__auto__'}">
+      <xacro:property name="lidar_frame" value="${frame}"/>
+    </xacro:if>
+
+    <!-- Default topic depends on publish_pointcloud -->
+    <xacro:property name="lidar_topic" value="${('/lidar/points') if publish_pointcloud else ('/scan_3d')}"/>
+    <!-- Override if user passed explicit topic -->
+    <xacro:if value="${topic != '__auto__'}">
+      <xacro:property name="lidar_topic" value="${topic}"/>
+    </xacro:if>
+
+    <!-- Mount joint -->
+    <joint name="${link}_joint" type="fixed">
+      <parent link="${parent}"/>
+      <child link="${link}"/>
+      <origin xyz="0 0 0.05" rpy="0 0 0"/>
+    </joint>
+
+    <!-- LiDAR link -->
+    <link name="${link}">
+      <visual>
+        <geometry><cylinder radius="0.05" length="0.1"/></geometry>
+        <material name="purple"/>
+      </visual>
+      <collision>
+        <geometry><cylinder radius="0.05" length="0.1"/></geometry>
+      </collision>
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="0.055"/>
+        <inertia ixx="0.000021370" ixy="0" ixz="0"
+                 iyy="0.000009966" iyz="0"
+                 izz="0.000021370"/>
+      </inertial>
+    </link>
+
+    <!-- If publish_pointcloud==true: CPU ray + block_laser -> PointCloud2 -->
+    <xacro:if value="${publish_pointcloud}">
+      <gazebo reference="${link}">
+        <sensor type="ray" name="${link}_sensor">
+          <always_on>true</always_on>
+          <update_rate>${update_rate}</update_rate>
+          <visualize>true</visualize>
+          <pose>0 0 0 0 0 0</pose>
+
+          <ray>
+            <scan>
+              <horizontal>
+                <samples>${horizontal_samples}</samples>
+                <resolution>1</resolution>
+                <min_angle>${h_min}</min_angle>
+                <max_angle>${h_max}</max_angle>
+              </horizontal>
+              <vertical>
+                <samples>${vertical_samples}</samples>
+                <resolution>1</resolution>
+                <min_angle>${v_min}</min_angle>
+                <max_angle>${v_max}</max_angle>
+              </vertical>
+            </scan>
+            <range>
+              <min>${range_min}</min>
+              <max>${range_max}</max>
+              <resolution>${range_res}</resolution>
+            </range>
+            <noise><type>gaussian</type><mean>0.0</mean><stddev>0.01</stddev></noise>
+          </ray>
+
+          <plugin name="${link}_block_laser" filename="libgazebo_ros_block_laser.so">
+            <topicName>${lidar_topic}</topicName>
+            <frameName>${lidar_frame}</frameName>
+          </plugin>
+        </sensor>
+      </gazebo>
+    </xacro:if>
+
+    <!-- Else: GPU ray + gpu_laser -> LaserScan -->
+    <xacro:unless value="${publish_pointcloud}">
+      <gazebo reference="${link}">
+        <sensor type="gpu_ray" name="${link}_sensor">
+          <always_on>true</always_on>
+          <update_rate>${update_rate}</update_rate>
+          <visualize>true</visualize>
+          <pose>0 0 0 0 0 0</pose>
+
+          <ray>
+            <scan>
+              <horizontal>
+                <samples>${horizontal_samples}</samples>
+                <resolution>1</resolution>
+                <min_angle>${h_min}</min_angle>
+                <max_angle>${h_max}</max_angle>
+              </horizontal>
+              <vertical>
+                <samples>${vertical_samples}</samples>
+                <resolution>1</resolution>
+                <min_angle>${v_min}</min_angle>
+                <max_angle>${v_max}</max_angle>
+              </vertical>
+            </scan>
+            <range>
+              <min>${range_min}</min>
+              <max>${range_max}</max>
+              <resolution>${range_res}</resolution>
+            </range>
+            <noise><type>gaussian</type><mean>0.0</mean><stddev>0.01</stddev></noise>
+          </ray>
+
+          <plugin name="${link}_gpu_laser" filename="libgazebo_ros_gpu_laser.so">
+            <topicName>${lidar_topic}</topicName>
+            <frameName>${lidar_frame}</frameName>
+          </plugin>
+        </sensor>
+      </gazebo>
+    </xacro:unless>
+
+  </xacro:macro>
+</robot>

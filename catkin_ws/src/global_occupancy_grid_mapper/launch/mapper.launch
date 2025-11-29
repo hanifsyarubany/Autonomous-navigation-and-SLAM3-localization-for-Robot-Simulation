@@ -1,0 +1,40 @@
+<launch>
+  <!-- Fixed/world frame where the grid will live -->
+  <arg name="fixed_frame" default="odom "/>
+
+  <!-- Obstacle point cloud topic (from your heightmap node) -->
+  <arg name="obstacles_topic" default="/points/velodyne_obstacles"/>
+
+  <!-- Output grid topic -->
+  <arg name="grid_topic" default="/persistent_map/occupancy"/>
+
+  <node pkg="global_occupancy_grid_mapper" type="occupancy_grid_mapper_node.py" name="occupancy_grid_mapper" output="screen">
+    <param name="fixed_frame" value="$(arg fixed_frame)"/>
+    <param name="obstacles_topic" value="$(arg obstacles_topic)"/>
+    <param name="grid_topic" value="$(arg grid_topic)"/>
+
+    <!-- Map geometry -->
+    <param name="resolution" value="0.1"/>
+    <param name="xmin" value="-20.0"/>
+    <param name="xmax" value="20.0"/>
+    <param name="ymin" value="-20.0"/>
+    <param name="ymax" value="20.0"/>
+
+    <!-- Sensor/model options -->
+    <param name="voxel_leaf" value="0.10"/>     <!-- downsample size (m) -->
+    <param name="do_raytrace" value="true"/>
+    <param name="max_range" value="0.0"/>       <!-- 0 = unlimited -->
+
+    <!-- Log-odds parameters -->
+    <param name="l_occ" value="0.85"/>
+    <param name="l_free" value="-0.40"/>
+    <param name="l_min" value="-2.0"/>
+    <param name="l_max" value=" 3.5"/>
+    <param name="p_occ_pub_thresh" value="0.65"/>
+    <param name="p_free_pub_thresh" value="0.20"/>
+    <param name="initialize_unknown" value="true"/>
+
+    <!-- Optional inflation (meters; 0 disables) -->
+    <param name="inflation_radius" value="0.2"/>
+  </node>
+</launch>

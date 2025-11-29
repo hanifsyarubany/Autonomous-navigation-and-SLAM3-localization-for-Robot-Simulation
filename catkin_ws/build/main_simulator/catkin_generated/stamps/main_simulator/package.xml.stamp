@@ -1,0 +1,25 @@
+<package format="2">
+  <name>main_simulator</name>
+  <version>0.0.1</version>
+  <description>Main simulator package</description>
+
+  <maintainer email="you@example.com">Your Name</maintainer>
+  <license>BSD-3-Clause</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <!-- Combined deps -->
+  <depend>geometry_msgs</depend>
+  <depend>gazebo</depend>
+  <depend>gazebo_ros</depend>
+  <depend>gazebo-dev</depend>
+  <depend>nav_msgs</depend>
+  <depend>roscpp</depend>
+  <depend>std_msgs</depend>
+  <depend>std_srvs</depend>
+  <depend>tf</depend>
+
+  <!-- Only if you define custom msgs/srvs -->
+  <build_depend>message_generation</build_depend>
+  <exec_depend>message_runtime</exec_depend>
+</package>

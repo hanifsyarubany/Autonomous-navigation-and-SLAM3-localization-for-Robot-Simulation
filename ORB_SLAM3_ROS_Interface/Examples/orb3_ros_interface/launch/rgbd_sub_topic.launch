@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<launch>
+    <param name="use_sim_time" value="true" />
+
+    <arg name="path_to_orb" default="/home/hanif/ORB_SLAM3_ROS_Interface/"/>
+    <arg name="path_to_vocabulary" default="Vocabulary/ORBvoc.txt"/>
+    <!-- <arg name="path_to_settings" default="Examples/RGB-D/TUM2.yaml"/> -->
+    <arg name="path_to_settings" default="Examples/RGB-D/RealSense_D435i.yaml"/>
+
+    <arg name="use_pangolin" default="true"/>
+    
+    <!-- Input topic FOR TUM RGB-D Dataset-->
+    <!-- <arg name="rgb_topic" default="/camera/rgb/image_color"/>
+    <arg name="depth_topic" default="/camera/depth/image"/> -->
+    
+    <!-- Input topic FOR ROBOT SIMULATION -->
+    <arg name="rgb_topic" default="/camera/color/image_raw"/>
+    <arg name="depth_topic" default="/depth_registered/image_rect"/>
+
+    <!-- Output topic -->
+    <arg name="pose_topic" default="/orb_slam3/pose"/>    
+    <arg name="odom_topic" default="/orb_slam3/odom"/>    
+
+    <node name="rgbd_sub_topic" pkg="orb3_ros_interface" type="rgbd_sub_topic" output="screen"
+    args="$(arg path_to_orb)$(arg path_to_vocabulary) $(arg path_to_orb)$(arg path_to_settings)" >
+      <param name="enable_pangolin" type="bool" value="$(arg use_pangolin)" />
+      <param name="rgb_topic" type="string" value="$(arg rgb_topic)" />
+      <param name="depth_topic" type="string" value="$(arg depth_topic)" />
+      <param name="pose_topic" type="string" value="$(arg pose_topic)" />
+      <param name="odom_topic" type="string" value="$(arg odom_topic)" />
+    </node>
+</launch>

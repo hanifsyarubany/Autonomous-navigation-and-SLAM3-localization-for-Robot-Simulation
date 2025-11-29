@@ -1,0 +1,7 @@
+<launch>
+    <node pkg="graph_planner_1" name="graph_planner_node" type="graph_planner_1_node"  respawn="true" output="screen">
+      <param name="csv_path"                  value="$(find graph_planner_1)/csv/graph_planner_gazebo.csv" />
+      <param name="robot_postion_topic"       value="/odom" />
+      <param name="use_rviz_goal"             value="false" />
+  </node>
+</launch>

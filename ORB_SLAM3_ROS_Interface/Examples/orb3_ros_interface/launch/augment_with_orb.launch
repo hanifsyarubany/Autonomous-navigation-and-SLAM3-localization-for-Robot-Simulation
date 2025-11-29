@@ -1,0 +1,20 @@
+<launch>
+  <param name="use_sim_time" value="true"/>
+
+  <arg name="in_bag"  default="$(env HOME)/Hanif-Workspace/Homework_3/Dataset/rgbd_dataset_freiburg2_pioneer_slam.bag"/>
+  <arg name="out_bag" default="$(env HOME)/Hanif-Workspace/Homework_3/Dataset/fr2_pioneer_with_orb_slam3_nFeatures_1500.bag"/>
+
+  <include file="$(find orb3_ros_interface)/launch/rgbd_sub_topic.launch">
+    <arg name="pose_topic" value="/orb_slam3/pose"/>
+    <arg name="odom_topic" value="/orb_slam3/odom"/>
+  </include>
+
+  <node pkg="rosbag" type="record" name="rec" output="screen"
+        args="-O $(arg out_bag)
+              /tf /imu /clock /ground_truth/pose
+              /orb_slam3/pose /orb_slam3/odom"/>
+
+  <node pkg="rosbag" type="play" name="play" output="screen"
+      args="--clock $(arg in_bag) /pose:=/ground_truth/pose"/>
+
+</launch>
